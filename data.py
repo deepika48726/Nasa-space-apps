@@ -7,7 +7,6 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 import requests
-import streamlit as st
 
 
 POWER_MONTHLY_ENDPOINT = "https://power.larc.nasa.gov/api/temporal/monthly/point"
@@ -20,7 +19,6 @@ class PowerAPIError(Exception):
     pass
 
 
-@st.cache_data(show_spinner=False, ttl=3600)
 def get_power_monthly(
     lat: float,
     lon: float,

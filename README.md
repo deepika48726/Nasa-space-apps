@@ -87,6 +87,53 @@ If you wish to run the standalone Streamlit app:
 
 ---
 
+## 🚀 Deployment
+
+### Environment Variables
+
+| Location | Variable | Purpose |
+| :--- | :--- | :--- |
+| Backend (`.env` / Render) | `FRONTEND_ORIGIN` | Deployed frontend URL added to FastAPI CORS (e.g. `https://earth-trend-detective.vercel.app`). Leave blank during local dev. |
+| Frontend (`frontend/.env` / Vercel/Netlify) | `VITE_API_URL` | Base URL of the deployed FastAPI backend, **no trailing slash** (e.g. `https://earth-trend-detective-api.onrender.com`). Leave blank for local dev (Vite proxy handles it). |
+
+> Copy `.env.example` → `.env` (repo root) and `frontend/.env.example` → `frontend/.env`, fill in values, and **never commit `.env`** (already in `.gitignore`).
+
+---
+
+### Option A — Render (FastAPI backend)
+
+1. Push the repo to GitHub.
+2. In [Render](https://render.com) → **New → Web Service** → connect your repo.
+3. Render auto-detects `render.yaml`; confirm the settings:
+   - **Build command:** `pip install -r requirements.txt`
+   - **Start command:** `uvicorn api:app --host 0.0.0.0 --port $PORT`
+4. Under **Environment**, set `FRONTEND_ORIGIN` to your deployed frontend URL.
+5. Click **Deploy** — the API will be live at `https://<your-service>.onrender.com`.
+
+---
+
+### Option B — Vercel / Netlify (React frontend)
+
+**Vercel:**
+```powershell
+cd frontend
+npx vercel --prod
+# Set environment variable during setup:
+#   VITE_API_URL = https://<your-render-service>.onrender.com
+```
+
+**Netlify:**
+```powershell
+cd frontend
+npm run build        # outputs to frontend/dist/
+# Upload dist/ via Netlify UI or netlify deploy --dir=dist
+# Set env var: VITE_API_URL = https://<your-render-service>.onrender.com
+```
+
+After the frontend is deployed, copy its URL back to Render's `FRONTEND_ORIGIN` and trigger a redeploy to complete CORS wiring.
+
+---
+
 ## 🌟 Application Features & Navigation
 
 | Tab | Feature Highlights |

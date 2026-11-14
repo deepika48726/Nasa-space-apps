@@ -2,7 +2,11 @@
  * API client for Earth Trend Detective FastAPI backend.
  */
 
-const API_BASE = '/api';
+// VITE_API_URL is set at build time (e.g. https://your-api.onrender.com).
+// Falls back to the Vite dev-server proxy (/api → http://localhost:8000) in local dev.
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api';
 
 export async function fetchVariables() {
   const res = await fetch(`${API_BASE}/variables`);

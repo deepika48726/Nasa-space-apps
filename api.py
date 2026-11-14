@@ -6,6 +6,7 @@ Reuses existing data.py, analysis.py, variables.py, and presets.py without modif
 
 from typing import Any, Dict, List, Optional
 import math
+import os
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException, status
@@ -23,20 +24,30 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Enable CORS for Vite frontend (http://localhost:5173) and local development
+# ---------------------------------------------------------------------------
+# CORS
+# ---------------------------------------------------------------------------
+# FRONTEND_ORIGIN: set this env var on Render/Railway to your deployed
+# frontend URL (e.g. https://earth-trend-detective.vercel.app).
+_FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "")
+
+_CORS_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+if _FRONTEND_ORIGIN:
+    _CORS_ORIGINS.append(_FRONTEND_ORIGIN)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "*",  # Allow all during local dev / test
-    ],
+    allow_origins=_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # In-memory LRU/Bounded Cache for API requests
 _CACHE: Dict[tuple, Dict[str, Any]] = {}

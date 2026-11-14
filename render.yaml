@@ -1,0 +1,16 @@
+services:
+  # ── FastAPI backend ──────────────────────────────────────────────────────────
+  - type: web
+    name: earth-trend-detective-api
+    runtime: python
+    region: oregon
+    plan: free
+
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api:app --host 0.0.0.0 --port $PORT
+
+    envVars:
+      # Set FRONTEND_ORIGIN to your deployed frontend URL after first deploy.
+      # Example: https://earth-trend-detective.vercel.app
+      - key: FRONTEND_ORIGIN
+        value: ""          # ← fill in after frontend is deployed
