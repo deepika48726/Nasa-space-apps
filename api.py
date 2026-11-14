@@ -57,7 +57,7 @@ class AnalyzeRequest(BaseModel):
     lon: float = Field(..., ge=-180.0, le=180.0)
     variable: str = Field(..., description="NASA POWER parameter, e.g. T2M, PRECTOTCORR")
     start_year: int = Field(default=1990, ge=1981, le=2025)
-    end_year: int = Field(default=2024, ge=1981, le=2025)
+    end_year: int = Field(default=2025, ge=1981, le=2025)
     name: Optional[str] = None
 
 
@@ -66,7 +66,7 @@ class CompareRequest(BaseModel):
     locationB: LocationInput
     variable: str
     start_year: int = Field(default=1990, ge=1981, le=2025)
-    end_year: int = Field(default=2024, ge=1981, le=2025)
+    end_year: int = Field(default=2025, ge=1981, le=2025)
 
 
 class DetectiveRecommendRequest(BaseModel):
@@ -255,8 +255,30 @@ def get_presets():
 
 @app.get("/api/demos")
 def get_demos():
-    """Return guided demo case study configurations and story text."""
-    return GUIDED_DEMOS
+    """Return guided demo configurations with live computed trend statistics and story text."""
+    results = []
+    for d in GUIDED_DEMOS:
+        demo_item = dict(d)
+        try:
+            res = _run_cached_analysis(
+                lat=d["lat"],
+                lon=d["lon"],
+                variable=d["variable"],
+                start_year=d["start_year"],
+                end_year=d["end_year"],
+                name=d["region_key"],
+            )
+            demo_item["live_slope_per_decade"] = res["slope_per_decade"]
+            demo_item["live_p"] = res["p"]
+            demo_item["live_significant"] = res["significant"]
+            demo_item["live_trend"] = res["trend"]
+            demo_item["live_ci_low"] = res["ci_low"]
+            demo_item["live_ci_high"] = res["ci_high"]
+            demo_item["unit"] = VARIABLES.get(d["variable"], {}).get("unit", "")
+        except Exception:
+            pass
+        results.append(demo_item)
+    return results
 
 
 @app.get("/api/detective/questions")
@@ -285,7 +307,7 @@ def recommend_mission(payload: DetectiveRecommendRequest):
 
 @app.post("/api/analyze")
 def analyze_endpoint(req: AnalyzeRequest):
-    """Fetch monthly satellite observations and compute statistical trends."""
+    """Fetch monthly NASA MERRA-2 reanalysis (satellite-informed model data) via NASA POWER and compute statistical trends."""
     return _run_cached_analysis(
         lat=req.lat,
         lon=req.lon,

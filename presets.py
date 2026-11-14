@@ -104,16 +104,16 @@ GUIDED_DEMOS: List[GuidedDemo] = [
         "lat": 78.22,
         "lon": 15.65,
         "start_year": 1990,
-        "end_year": 2024,
+        "end_year": 2025,
         "tag": "🔥 Strong Warming Trend",
         "story": (
-            "The Arctic is warming 3 to 4 times faster than the rest of the planet! "
+            "The Arctic is warming faster than the rest of the planet due to polar amplification. "
             "As bright white sea ice melts, darker ocean waters absorb more solar energy "
-            "instead of reflecting it into space—a feedback loop called Arctic Amplification."
+            "instead of reflecting it into space—accelerating regional warming."
         ),
         "what_to_look_for": (
-            "Look at the steep upward slope in the anomaly line and notice how small the p-value is (p < 0.001), "
-            "confirming a statistically significant warming trend of over +0.8 °C per decade."
+            "Observe the steep upward slope in the anomaly line and check whether the "
+            "autocorrelation-corrected p-value confirms a statistically significant warming trend."
         ),
     },
     {
@@ -124,16 +124,16 @@ GUIDED_DEMOS: List[GuidedDemo] = [
         "lat": 14.50,
         "lon": 1.50,
         "start_year": 1990,
-        "end_year": 2024,
+        "end_year": 2025,
         "tag": "🌧️ Precipitation Shift",
         "story": (
-            "Following severe, famine-inducing droughts during the 1970s and 1980s, climate scientists "
-            "observed a partial resurgence in rainfall across the African Sahel. Satellite sensors "
-            "even dubbed this the 'Greening of the Sahel'."
+            "Following severe, famine-inducing droughts in the late 20th century, climate scientists "
+            "observed a partial resurgence in rainfall across the African Sahel ('the greening Sahel'). "
+            "NASA MERRA-2 reanalysis data via NASA POWER allows us to test if this recovery trend is statistically significant."
         ),
         "what_to_look_for": (
             "Observe the wide seasonal swings in the raw precipitation data, and see how deseasonalizing "
-            "reveals whether the post-1990 anomaly trend shows an upward slope."
+            "reveals whether the post-1990 anomaly trend shows an upward slope or remains within natural variability."
         ),
     },
     {
@@ -144,7 +144,7 @@ GUIDED_DEMOS: List[GuidedDemo] = [
         "lat": 38.50,
         "lon": -99.00,
         "start_year": 1990,
-        "end_year": 2024,
+        "end_year": 2025,
         "tag": "⚖️ Stable / No Significant Trend",
         "story": (
             "Not every Earth science variable displays a monotonic upward or downward trend everywhere! "
@@ -152,7 +152,7 @@ GUIDED_DEMOS: List[GuidedDemo] = [
             "statistically significant directional climb or decline."
         ),
         "what_to_look_for": (
-            "Notice how the Theil-Sen slope is near zero and the p-value is well above 0.05. "
+            "Notice how the Theil-Sen slope remains close to zero and the p-value stays above 0.05. "
             "The test concludes that there is no statistically significant trend—natural variability dominates."
         ),
     },
@@ -177,7 +177,7 @@ DETECTIVE_QUESTIONS = [
         "question": "2. Which sphere of the Earth system are you most curious about?",
         "options": [
             ("Atmosphere (Air Temperature & Wind)", "atmosphere"),
-            ("Hydrosphere (Precipitation & Moisture)", "hydrosphere"),
+            ("Water cycle (Precipitation & Moisture) — Note: Ocean variables are not included", "hydrosphere"),
             ("Biosphere / Land (Soil Wetness & Sunlight)", "land"),
         ],
     },

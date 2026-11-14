@@ -23,7 +23,7 @@ export default function App() {
   const [selectedLon, setSelectedLon] = useState(15.65);
   const [selectedRegionName, setSelectedRegionName] = useState('Arctic (Svalbard)');
   const [startYear, setStartYear] = useState(1990);
-  const [endYear, setEndYear] = useState(2024);
+  const [endYear, setEndYear] = useState(2025);
 
   // Initial Fetch of Catalog and Presets
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function App() {
     if (lat !== undefined) setSelectedLat(lat);
     if (lon !== undefined) setSelectedLon(lon);
     setStartYear(1990);
-    setEndYear(2024);
+    setEndYear(2025);
     setActiveTab('investigate');
     toast.success(`🔍 Detective Mission Loaded: ${regionKey}!`, { icon: '🛰️' });
   };
@@ -138,17 +138,10 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/5 py-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span>NASA Space Apps Challenge</span>
-            <span>•</span>
-            <span className="text-slate-400">Earth Trend Detective</span>
-          </div>
-          <div>
-            Data: NASA Langley Research Center POWER API (MERRA-2 assimilation)
-          </div>
+      {/* Global Footer on every tab */}
+      <footer className="border-t border-white/5 py-6 text-center text-[11px] text-slate-500">
+        <div className="max-w-4xl mx-auto px-4 leading-relaxed">
+          Data: NASA POWER, derived from MERRA-2 reanalysis (NASA GMAO). Built for the NASA Space Apps Challenge. NASA does not endorse this project or any non-U.S. Government entity, and is not responsible for information on non-U.S. Government websites.
         </div>
       </footer>
     </div>

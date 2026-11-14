@@ -48,7 +48,7 @@ export default function DemosView({ demos = [], onLaunchDemo }) {
           Guided Earth Science Mysteries
         </h2>
         <p className="text-sm text-slate-300 mt-1 max-w-3xl leading-relaxed">
-          Explore three handpicked climate questions that demonstrate how NASA satellite observations reveal rapid Arctic warming, fluctuating semi-arid rainfall, or the vital scientific conclusion that natural multi-year variability dominates.
+          Explore three handpicked climate questions that demonstrate how NASA MERRA-2 reanalysis (satellite-informed model data) via NASA POWER reveals rapid Arctic warming, fluctuating semi-arid rainfall, or the vital scientific conclusion that natural multi-year variability dominates.
         </p>
       </div>
 
@@ -70,15 +70,50 @@ export default function DemosView({ demos = [], onLaunchDemo }) {
                   </span>
                   <h3 className="text-lg font-bold text-white tracking-tight">{demo.title}</h3>
                   <div className="text-xs font-mono text-slate-400 mt-1">
-                    {demo.region_key} ({demo.lat.toFixed(2)}°, {demo.lon.toFixed(2)}°) • {demo.variable}
+                    {demo.region_key} ({demo.lat.toFixed(2)}°, {demo.lon.toFixed(2)}°) • {demo.variable} • {demo.start_year}–{demo.end_year}
                   </div>
                 </div>
+
+                {/* Live Computed Metrics Badge */}
+                {demo.live_slope_per_decade !== undefined && (
+                  <div className="p-3.5 rounded-xl bg-slate-900/90 border border-cyan-500/20 space-y-2">
+                    <div className="text-[10px] uppercase font-bold tracking-wider text-cyan-400 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-cyan-400" />
+                      Live Computed Trend Statistics:
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">Theil-Sen Slope:</span>
+                        <span className={`font-bold text-sm ${demo.live_significant ? (demo.live_slope_per_decade > 0 ? 'text-rose-400' : 'text-cyan-400') : 'text-slate-200'}`}>
+                          {demo.live_slope_per_decade >= 0 ? '+' : ''}{demo.live_slope_per_decade?.toFixed(2)} {demo.unit}/dec
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-slate-400 block text-[10px]">Hamed-Rao p-value:</span>
+                        <span className={`font-bold text-sm ${demo.live_p < 0.05 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                          {demo.live_p < 0.001 ? '< 0.001' : demo.live_p?.toFixed(4)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-[11px] pt-1 border-t border-white/5">
+                      {demo.live_significant ? (
+                        <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Statistically Significant (p &lt; 0.05)
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 font-semibold">
+                          ⚖️ Not Statistically Significant (p &ge; 0.05)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Story Narrative */}
                 <div className="p-4 rounded-xl bg-slate-900/60 border border-white/5 text-xs text-slate-300 leading-relaxed">
                   <h4 className="font-semibold text-slate-200 mb-1 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                    The Scientific Mystery:
+                    The Scientific Story:
                   </h4>
                   <p>{demo.story}</p>
                 </div>

@@ -74,9 +74,9 @@ def analyze(
     if n_years <= 0:
         n_years = round(n_obs / 12.0, 1)
 
-    # 2. Non-parametric Mann-Kendall test on anomalies
-    # Note: pymannkendall original_test tests for monotonic upward/downward trends
-    mk_res = mk.original_test(clean_anom.values)
+    # 2. Non-parametric Mann-Kendall test on anomalies (Hamed & Rao 1998 modification)
+    # Autocorrelation-corrected to prevent inflated significance from climate persistence/lag-1 memory
+    mk_res = mk.hamed_rao_modification_test(clean_anom.values)
     trend_direction = str(mk_res.trend).lower()  # 'increasing', 'decreasing', 'no trend'
     p_value = float(mk_res.p)
     is_significant = bool(p_value < 0.05)

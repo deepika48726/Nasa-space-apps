@@ -7,7 +7,7 @@ const STEPS = [
   {
     id: 'environment',
     title: '1. Which Earth environment fascinates you most?',
-    subtitle: 'Choose the biome or terrain you want to explore with satellite data.',
+    subtitle: 'Choose the biome or terrain you want to explore with NASA MERRA-2 reanalysis data via NASA POWER.',
     options: [
       { id: 'polar', label: '❄️ Polar & Glacial', desc: 'Arctic ice caps, Antarctic glaciers, sub-zero latitudes' },
       { id: 'tropical', label: '🌴 Tropical Rainforests & Coasts', desc: 'Amazon rainforest, monsoon coastlines, dense canopy' },
@@ -22,7 +22,7 @@ const STEPS = [
     subtitle: 'Earth is a dynamic interconnected system of spheres.',
     options: [
       { id: 'atmosphere', label: '💨 Atmosphere (Air & Wind)', desc: 'Surface air temperature, wind speeds, atmospheric circulation' },
-      { id: 'hydrosphere', label: '🌧️ Hydrosphere (Precipitation & Moisture)', desc: 'Rainfall, snowfall, water cycle and relative humidity' },
+      { id: 'hydrosphere', label: '🌧️ Water cycle (Precipitation & Moisture)', desc: 'Rainfall, snowfall, and relative humidity. Note: Ocean variables (e.g. sea surface temperature) are not included; NASA POWER AG focuses on terrestrial and land-surface climate.' },
       { id: 'land', label: '🌱 Biosphere / Geosphere (Soil & Sun)', desc: 'Root zone soil moisture, incoming solar irradiance' },
     ],
   },

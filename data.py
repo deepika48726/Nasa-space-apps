@@ -54,7 +54,7 @@ def get_power_monthly(
     if start_year > end_year:
         raise ValueError(f"Start year ({start_year}) cannot be greater than end year ({end_year}).")
     if start_year < 1981:
-        raise ValueError(f"NASA POWER satellite records begin in 1981. Received: {start_year}")
+        raise ValueError(f"NASA MERRA-2 reanalysis records via NASA POWER begin in 1981. Received: {start_year}")
 
     # Normalize coordinates to 4 decimal places for stable caching and query format
     lat_norm = round(float(lat), 4)
@@ -84,7 +84,7 @@ def get_power_monthly(
         )
     except requests.exceptions.Timeout:
         raise PowerAPIError(
-            "NASA POWER server timed out. Satellite servers might be experiencing high traffic. "
+            "NASA POWER server timed out. Reanalysis servers might be experiencing high traffic. "
             "Please try again or select a slightly smaller year range."
         )
     except requests.exceptions.ConnectionError:

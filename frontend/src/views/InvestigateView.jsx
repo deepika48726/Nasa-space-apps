@@ -53,7 +53,7 @@ export default function InvestigateView({
       setData(res);
     } catch (err) {
       console.error('Analysis error:', err);
-      const msg = err.message || 'Failed to fetch satellite data';
+      const msg = err.message || 'Failed to fetch NASA MERRA-2 reanalysis data via NASA POWER';
       setError(msg);
       toast.error(msg, { duration: 5000 });
     } finally {
@@ -198,7 +198,7 @@ export default function InvestigateView({
               </div>
               <input
                 type="range"
-                min="1990"
+                min="1981"
                 max={endYear - 3}
                 value={startYear}
                 onChange={(e) => setStartYear(parseInt(e.target.value, 10))}
@@ -209,7 +209,7 @@ export default function InvestigateView({
               <input
                 type="range"
                 min={startYear + 3}
-                max="2024"
+                max="2025"
                 value={endYear}
                 onChange={(e) => setEndYear(parseInt(e.target.value, 10))}
                 className="w-full accent-cyan-400 cursor-pointer"
@@ -217,7 +217,7 @@ export default function InvestigateView({
             </div>
           </div>
           <p className="text-[11px] text-slate-500">
-            Selected span: <strong className="text-slate-300">{endYear - startYear + 1} years</strong> of monthly NASA satellite observations.
+            Selected span: <strong className="text-slate-300">{endYear - startYear + 1} years</strong> of monthly NASA MERRA-2 reanalysis (satellite-informed model data) via NASA POWER.
           </p>
         </div>
       </div>

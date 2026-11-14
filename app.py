@@ -173,7 +173,7 @@ if "start_year" not in st.session_state:
     st.session_state["start_year"] = 1990
 
 if "end_year" not in st.session_state:
-    st.session_state["end_year"] = 2024
+    st.session_state["end_year"] = 2025
 
 if "loc_mode" not in st.session_state:
     st.session_state["loc_mode"] = "Preset Region"
@@ -188,7 +188,7 @@ st.markdown(
         <div class="hero-badge">🚀 NASA Space Apps Challenge</div>
         <h1 class="hero-title">🌍 Earth Trend Detective</h1>
         <p class="hero-subtitle">
-            Is Earth's climate changing where you live? Pick any location, fetch authentic NASA satellite data,
+            Is Earth's climate changing where you live? Pick any location, fetch NASA MERRA-2 reanalysis (satellite-informed model data) via NASA POWER,
             strip away the seasonal cycle, and uncover whether the trend is statistically significant.
         </p>
     </div>
@@ -356,15 +356,15 @@ with tab_investigate:
         st.subheader("📅 Time Horizon")
         year_range = st.slider(
             "Observation Years:",
-            min_value=1990,
-            max_value=2024,
+            min_value=1981,
+            max_value=2025,
             value=(st.session_state["start_year"], st.session_state["end_year"]),
             step=1,
-            help="Select the start and end year. (1990 to latest full year 2024).",
+            help="Select the start and end year (1981 to latest full year 2025).",
         )
         st.session_state["start_year"], st.session_state["end_year"] = year_range
 
-        st.caption("🛰️ Data Source: NASA Langley POWER API (MERRA-2 assimilation)")
+        st.caption("🛰️ Data Source: NASA MERRA-2 reanalysis (satellite-informed model data) via NASA POWER")
 
     # ------------------ Main Area: Fetch, Analyze, Display ------------------
     st.subheader(
@@ -374,7 +374,7 @@ with tab_investigate:
     fetch_success = False
     analysis_res: Optional[Dict[str, Any]] = None
 
-    with st.spinner("🛰️ Querying NASA POWER satellite servers & computing trend statistics..."):
+    with st.spinner("🛰️ Querying NASA MERRA-2 reanalysis via NASA POWER & computing trend statistics..."):
         try:
             raw_series = get_power_monthly(
                 lat=target_lat,
@@ -482,6 +482,18 @@ with tab_investigate:
             unsafe_allow_html=True,
         )
 
+        # Cross-check this result
+        st.markdown(
+            """
+            <div style="font-size: 0.85rem; color: #64748b; margin-top: -8px; margin-bottom: 16px;">
+                🔗 <b>Cross-check this result:</b> 
+                <a href="https://giovanni.gsfc.nasa.gov/" target="_blank" style="color: #00e5ff; text-decoration: underline;">NASA Giovanni ↗</a> &nbsp;•&nbsp; 
+                <a href="https://climexp.knmi.nl/" target="_blank" style="color: #00e5ff; text-decoration: underline;">KNMI Climate Explorer ↗</a>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
         # 3. Interactive Plotly Charts
         trend_fig = create_trend_figure(
             res=analysis_res,
@@ -567,9 +579,9 @@ with tab_compare:
     with comp_c2:
         comp_years = st.slider(
             "Comparison Years:",
-            min_value=1990,
-            max_value=2024,
-            value=(1990, 2024),
+            min_value=1981,
+            max_value=2025,
+            value=(1990, 2025),
             key="comp_years",
         )
 
@@ -593,7 +605,7 @@ with tab_compare:
         st.caption(f"Coordinates: `{preset_b['lat']:.2f}°, {preset_b['lon']:.2f}°` | {preset_b['description']}")
 
     # Fetch and analyze both
-    with st.spinner("🛰️ Querying NASA POWER for both regions..."):
+    with st.spinner("🛰️ Querying NASA MERRA-2 reanalysis via NASA POWER for both regions..."):
         try:
             series_a = get_power_monthly(
                 preset_a["lat"], preset_a["lon"], comp_var_key, comp_years[0], comp_years[1]
@@ -691,6 +703,18 @@ with tab_compare:
                     unsafe_allow_html=True,
                 )
 
+            # Cross-check this result
+            st.markdown(
+                """
+                <div style="font-size: 0.85rem; color: #64748b; margin-top: 10px; margin-bottom: 20px; text-align: center;">
+                    🔗 <b>Cross-check these results:</b> 
+                    <a href="https://giovanni.gsfc.nasa.gov/" target="_blank" style="color: #00e5ff; text-decoration: underline;">NASA Giovanni ↗</a> &nbsp;•&nbsp; 
+                    <a href="https://climexp.knmi.nl/" target="_blank" style="color: #00e5ff; text-decoration: underline;">KNMI Climate Explorer ↗</a>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
         except PowerAPIError as pe:
             st.error(f"NASA POWER API Error during comparison: {str(pe)}")
         except Exception as e:
@@ -734,57 +758,91 @@ with tab_demos:
                 unsafe_allow_html=True,
             )
 
-            col_btn1, col_btn2 = st.columns([1, 2])
-            with col_btn1:
-                if st.button(
-                    f"⚡ Load Demo into Tab 1 (Investigate)",
-                    key=f"load_demo_{demo['id']}",
-                    help="Auto-configure the Investigate tab with these exact settings.",
-                ):
-                    st.session_state["investigate_var"] = demo["variable"]
-                    st.session_state["investigate_region"] = demo["region_key"]
-                    st.session_state["investigate_lat"] = demo["lat"]
-                    st.session_state["investigate_lon"] = demo["lon"]
-                    st.session_state["start_year"] = demo["start_year"]
-                    st.session_state["end_year"] = demo["end_year"]
-                    st.session_state["loc_mode"] = "Preset Region"
-                    st.success(
-                        f"✅ Settings loaded! Click the **🔍 1. Investigate** tab above to explore!"
+            # Live computed demo statistics
+            try:
+                with st.spinner("🛰️ Querying NASA MERRA-2 reanalysis via NASA POWER for live demo..."):
+                    d_series = get_power_monthly(
+                        demo["lat"], demo["lon"], demo["variable"], demo["start_year"], demo["end_year"]
+                    )
+                    d_res = analyze(
+                        d_series,
+                        var_name=v_info["name"],
+                        unit=v_info["unit"],
+                        lat=demo["lat"],
+                        lon=demo["lon"],
                     )
 
-            # Instant Live Analysis in place
-            with st.expander("👁️ Run Live Demo Analysis in Place", expanded=True):
-                with st.spinner("🛰️ Querying NASA POWER for live demo..."):
-                    try:
-                        d_series = get_power_monthly(
-                            demo["lat"], demo["lon"], demo["variable"], demo["start_year"], demo["end_year"]
-                        )
-                        d_res = analyze(
-                            d_series,
-                            var_name=v_info["name"],
-                            unit=v_info["unit"],
-                            lat=demo["lat"],
-                            lon=demo["lon"],
+                st.markdown("##### 🔬 Live Computed Metrics (NASA MERRA-2 Reanalysis):")
+                dm1, dm2, dm3, dm4 = st.columns(4)
+                with dm1:
+                    st.metric(
+                        "Theil-Sen Slope",
+                        f"{d_res['slope_per_decade']:+.2f} {v_info['unit']}/dec",
+                    )
+                with dm2:
+                    st.metric(
+                        "95% Confidence Interval",
+                        f"[{d_res['ci_low']:+.2f}, {d_res['ci_high']:+.2f}]",
+                    )
+                with dm3:
+                    st.metric(
+                        "Hamed-Rao p-value",
+                        f"{d_res['p']:.4f}",
+                    )
+                with dm4:
+                    st.metric(
+                        "Significance (α=0.05)",
+                        "Significant" if d_res["significant"] else "Not Significant",
+                    )
+
+                col_btn1, col_btn2 = st.columns([1, 2])
+                with col_btn1:
+                    if st.button(
+                        f"⚡ Load Demo into Tab 1 (Investigate)",
+                        key=f"load_demo_{demo['id']}",
+                        help="Auto-configure the Investigate tab with these exact settings.",
+                    ):
+                        st.session_state["investigate_var"] = demo["variable"]
+                        st.session_state["investigate_region"] = demo["region_key"]
+                        st.session_state["investigate_lat"] = demo["lat"]
+                        st.session_state["investigate_lon"] = demo["lon"]
+                        st.session_state["start_year"] = demo["start_year"]
+                        st.session_state["end_year"] = demo["end_year"]
+                        st.session_state["loc_mode"] = "Preset Region"
+                        st.success(
+                            f"✅ Settings loaded! Click the **🔍 1. Investigate** tab above to explore!"
                         )
 
-                        st.markdown(
-                            f"""
-                            <div class="verdict-box {'verdict-box-sig' if d_res['significant'] else 'verdict-box-insig'}">
-                                {d_res['verdict']}
-                            </div>
-                            """,
-                            unsafe_allow_html=True,
-                        )
+                # Interactive Visualization & Scientific Verdict
+                st.markdown(
+                    f"""
+                    <div class="verdict-box {'verdict-box-sig' if d_res['significant'] else 'verdict-box-insig'}">
+                        {d_res['verdict']}
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
-                        d_fig = create_trend_figure(
-                            res=d_res,
-                            var_info=v_info,
-                            location_title=f"{demo['region_key']} Demo",
-                        )
-                        st.plotly_chart(d_fig, use_container_width=True)
+                st.markdown(
+                    """
+                    <div style="font-size: 0.85rem; color: #64748b; margin-top: -8px; margin-bottom: 16px;">
+                        🔗 <b>Cross-check this result:</b> 
+                        <a href="https://giovanni.gsfc.nasa.gov/" target="_blank" style="color: #00e5ff; text-decoration: underline;">NASA Giovanni ↗</a> &nbsp;•&nbsp; 
+                        <a href="https://climexp.knmi.nl/" target="_blank" style="color: #00e5ff; text-decoration: underline;">KNMI Climate Explorer ↗</a>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
-                    except Exception as ex:
-                        st.error(f"Error executing demo: {str(ex)}")
+                d_fig = create_trend_figure(
+                    res=d_res,
+                    var_info=v_info,
+                    location_title=f"{demo['region_key']} Demo",
+                )
+                st.plotly_chart(d_fig, use_container_width=True)
+
+            except Exception as ex:
+                st.error(f"Error executing demo: {str(ex)}")
 
 
 # =============================================================================
@@ -868,16 +926,16 @@ with tab_detective:
                 st.session_state["investigate_lat"] = r_meta["lat"]
                 st.session_state["investigate_lon"] = r_meta["lon"]
                 st.session_state["start_year"] = 1990
-                st.session_state["end_year"] = 2024
+                st.session_state["end_year"] = 2025
                 st.session_state["loc_mode"] = "Preset Region"
                 st.success("✅ Mission settings loaded! Click on the **🔍 1. Investigate** tab above to explore!")
 
         # Inline Instant Preview
         with st.expander("👁️ Preview This Mission's Live Data Now", expanded=True):
-            with st.spinner("🛰️ Querying NASA POWER for recommended mission..."):
+            with st.spinner("🛰️ Querying NASA MERRA-2 reanalysis via NASA POWER for recommended mission..."):
                 try:
                     m_series = get_power_monthly(
-                        r_meta["lat"], r_meta["lon"], rec_var, 1990, 2024
+                        r_meta["lat"], r_meta["lon"], rec_var, 1990, 2025
                     )
                     m_res = analyze(
                         m_series,
@@ -949,6 +1007,16 @@ with tab_method:
         - The normalized test statistic $Z$ and its associated **$p$-value** measure the likelihood of getting this score by chance.
         - If $p < 0.05$, we reject the null hypothesis ($H_0$: no trend) and declare the trend **statistically significant** at the 95% confidence level.
         
+        #### 🔄 Autocorrelation Correction: Hamed & Rao (1998) Modification
+        A critical trap in climate time series analysis is **positive serial correlation (autocorrelation)**. Climate systems exhibit physical "memory" — a warm month is often followed by another warm month due to ocean heat storage or soil moisture inertia.
+        
+        - **The Statistical Pitfall:** Standard Mann-Kendall assumes consecutive observations are statistically independent. When positive lag-1 autocorrelation ($r_1 > 0$) exists, the variance of the test statistic $\\operatorname{Var}(S)$ is severely **underestimated**, artificially inflating $Z$-scores and causing false positives (Type I error — detecting a trend where none exists).
+        - **The Hamed & Rao Solution:** We use `pymannkendall.hamed_rao_modification_test`. It calculates an empirical autocorrelation function across significant lags and calculates an effective sample size factor $n / n^*$ to adjust the test variance:
+        
+        $$\\operatorname{Var}^*(S) = \\operatorname{Var}(S) \\cdot \\left[ 1 + \\frac{2}{n(n-1)(n-2)} \\sum_{i=1}^{n-1} (n-i)(n-i-1)(n-i-2) \\rho_s(i) \\right]$$
+        
+        Where $\\rho_s(i)$ is the rank autocorrelation at lag $i$. This ensures trends are only marked statistically significant when the climate signal genuinely overcomes internal natural persistence.
+        
         ---
         ### 3. The Theil-Sen Robust Slope Estimator & 95% Confidence Intervals
         Why not use standard Ordinary Least Squares (OLS) regression? 
@@ -968,12 +1036,66 @@ with tab_method:
         
         1. **Linear vs. Non-Linear Dynamics:** Theil-Sen measures a monotonic, linear trajectory. Earth systems can exhibit non-linear tipping points, regime shifts (e.g., sudden glacier collapse), or cyclical oscillations (such as the El Niño–Southern Oscillation / ENSO).
         2. **Single Point Sampling vs. Regional Spatial Grids:** Point coordinates can be influenced by local elevation, topography, or localized urban heat island effects. Regional conclusions require averaging across spatial grids.
-        3. **Reanalysis Model Data:** NASA POWER relies on the **MERRA-2** (Modern-Era Retrospective analysis for Research and Applications, Version 2) atmospheric assimilation model. While grounded in satellite radiometers and weather stations, it combines observational data with physics models.
+        3. **NASA MERRA-2 Reanalysis (Satellite-informed model data) via NASA POWER:** NASA POWER relies on the **MERRA-2** (Modern-Era Retrospective analysis for Research and Applications, Version 2) atmospheric assimilation model. While grounded in satellite radiometers and weather stations, it combines observational data with physics models.
         
         ---
-        ### 5. Data Attribution & Acknowledgements
-        - **Data Source:** [NASA Langley POWER Project](https://power.larc.nasa.gov/) (Prediction Of Worldwide Energy Resources)
-        - **Model Backing:** NASA Global Modeling and Assimilation Office (GMAO) MERRA-2
-        - **Developed For:** NASA Space Apps Challenge (Student & High School STEM Educational Track)
+        ### 5. Scientific Validation (Benchmark against NASA Giovanni)
+        To verify analytical accuracy, we cross-validated our pipeline against an independent retrieval from NASA Giovanni (MERRA-2 monthly surface air temperature product `M2TMNXSLV`).
         """
     )
+
+    st.image(
+        "validation/validation_giovanni_svalbard.png",
+        caption="Svalbard T2M trend, 1990-2024: +0.69 °C/decade (95% CI +0.50 to +0.88) in our tool vs +0.687 °C/decade (95% CI +0.50 to +0.88) computed from NASA Giovanni (MERRA-2 M2TMNXSLV, same grid cell at 15.625E, 78N). Both significant. Data: validation/giovanni_svalbard_t2m.csv in the repo.",
+        use_column_width=True,
+    )
+
+    st.markdown(
+        """
+        ---
+        ### 6. References & Further Tools
+        
+        Explore authoritative external portals and technical publications. *(Notice: Each external site's data terms apply.)*
+        
+        - [NASA Giovanni](https://giovanni.gsfc.nasa.gov/) — Web-based environment for interactive analysis, visualization, and exploration of NASA Earth science satellite and reanalysis data.
+        - [NASA Hydrology Time Series](https://disc.gsfc.nasa.gov/information/tools?title=Hydrology%20Time%20Series) — Online portal for point and regional extraction of multi-mission hydrological time series and land-surface model outputs.
+        - [NOAA Climate Data Online](https://www.ncei.noaa.gov/cdo-web/) — National Centers for Environmental Information repository providing free access to global historical weather station observations.
+        - [KNMI Climate Explorer](https://climexp.knmi.nl/) — Statistical research workbench for climate researchers to correlate, verify, and perform time-series analysis on global datasets.
+        - [Statistical test methods to detect trends in time series data](https://medium.com/@snp.kriss/statistical-test-methods-to-detect-trends-in-time-series-data-b361a0ec530b) — Comprehensive technical overview of parametric vs. non-parametric methods, Mann-Kendall formulation, and Sen's slope estimator.
+        - [A Comprehensive Guide to Statistical Significance](https://www.statsig.com/perspectives/a-comprehensive-guide-to-statistical-significance) — Pedagogical introduction to hypothesis testing, null hypotheses, p-values, confidence bounds, and Type I/II errors.
+        - [Time-Series Analysis of Remotely-Sensed SeaWiFS Chlorophyll in River-Influenced Coastal Regions](https://ntrs.nasa.gov/api/citations/20090042747/downloads/20090042747.pdf) — NASA technical publication detailing deseasonalizing methodologies and non-parametric monotonic trend detection on satellite time series.
+        
+        #### Seminal Mathematical Citations:
+        - **Mann, H. B. (1945):** Nonparametric tests against trend. *Econometrica*, 13(3), 245–259.
+        - **Kendall, M. G. (1975):** *Rank Correlation Methods*. 4th edition, Charles Griffin, London.
+        - **Sen, P. K. (1968):** Estimates of the regression coefficient based on Kendall's tau. *Journal of the American Statistical Association*, 63(324), 1379–1389.
+        - **Hamed, K. H., & Rao, A. R. (1998):** A modified Mann-Kendall trend test for autocorrelated data. *Journal of Hydrology*, 204(1–4), 182–196.
+        
+        ---
+        ### 7. Data Credits & Acknowledgements
+        - **Data Provider:** NASA MERRA-2 reanalysis (satellite-informed model data) via NASA POWER ([NASA Langley POWER Project](https://power.larc.nasa.gov/))
+        - **Atmospheric Model:** NASA GMAO MERRA-2 (Modern-Era Retrospective analysis for Research and Applications, Version 2)
+        - **Challenge:** Developed for the NASA Space Apps Challenge (Student & High School STEM Educational Track)
+        
+        ---
+        ### 8. Official Disclaimer
+        Data: NASA POWER, derived from MERRA-2 reanalysis (NASA GMAO). Built for the NASA Space Apps Challenge. NASA does not endorse this project or any non-U.S. Government entity, and is not responsible for information on non-U.S. Government websites.
+        
+        *Notice: Each external site's data terms apply.*
+        """
+    )
+
+
+# -----------------------------------------------------------------------------
+# Global Footer on Every Tab
+# -----------------------------------------------------------------------------
+st.markdown(
+    """
+    <hr style="margin-top: 40px; margin-bottom: 12px; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+    <div style="text-align: center; font-size: 0.75rem; color: #64748b; line-height: 1.6; max-width: 900px; margin: 0 auto 30px auto;">
+        Data: NASA POWER, derived from MERRA-2 reanalysis (NASA GMAO). Built for the NASA Space Apps Challenge. 
+        NASA does not endorse this project or any non-U.S. Government entity, and is not responsible for information on non-U.S. Government websites.
+    </div>
+    """,
+    unsafe_allow_html=True,
+)

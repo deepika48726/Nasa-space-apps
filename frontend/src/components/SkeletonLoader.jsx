@@ -30,7 +30,7 @@ export default function SkeletonLoader() {
         <div className="h-[460px] w-full bg-slate-800/30 rounded-xl border border-white/5 flex items-center justify-center">
           <div className="text-center space-y-2 text-slate-500">
             <div className="w-8 h-8 mx-auto border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-xs font-mono">Querying NASA POWER satellite servers...</p>
+            <p className="text-xs font-mono">Querying NASA MERRA-2 reanalysis via NASA POWER...</p>
           </div>
         </div>
       </div>

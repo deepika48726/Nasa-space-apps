@@ -15,7 +15,7 @@ export default function CompareView({ variables = {}, presets = {} }) {
   const [locAKey, setLocAKey] = useState('Arctic (Svalbard)');
   const [locBKey, setLocBKey] = useState('Great Plains');
   const [startYear, setStartYear] = useState(1990);
-  const [endYear, setEndYear] = useState(2024);
+  const [endYear, setEndYear] = useState(2025);
 
   const [comparison, setComparison] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -206,6 +206,34 @@ export default function CompareView({ variables = {}, presets = {} }) {
                 </option>
               ))}
             </select>
+          </div>
+        </div>
+
+        {/* Year Range Slider */}
+        <div className="pt-3 border-t border-white/5 flex items-center justify-between flex-wrap gap-4 text-xs">
+          <div className="flex items-center gap-3">
+            <span className="text-slate-400 font-medium">Comparison Horizon:</span>
+            <span className="font-mono text-cyan-300 font-bold">{startYear} – {endYear}</span>
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <span className="text-slate-500">1981</span>
+            <input
+              type="range"
+              min="1981"
+              max={endYear - 3}
+              value={startYear}
+              onChange={(e) => setStartYear(parseInt(e.target.value, 10))}
+              className="accent-cyan-400 cursor-pointer w-28 sm:w-40"
+            />
+            <input
+              type="range"
+              min={startYear + 3}
+              max="2025"
+              value={endYear}
+              onChange={(e) => setEndYear(parseInt(e.target.value, 10))}
+              className="accent-cyan-400 cursor-pointer w-28 sm:w-40"
+            />
+            <span className="text-slate-500">2025</span>
           </div>
         </div>
       </div>

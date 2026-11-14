@@ -1,7 +1,86 @@
 import React from 'react';
-import { BookOpen, Orbit, BarChart2, ShieldCheck, AlertCircle, Database } from 'lucide-react';
+import {
+  BookOpen,
+  Orbit,
+  BarChart2,
+  ShieldCheck,
+  AlertCircle,
+  Database,
+  ExternalLink,
+  CheckCircle2,
+  BookmarkCheck,
+  FileText,
+  Compass,
+} from 'lucide-react';
 
 export default function MethodologyView() {
+  const references = [
+    {
+      title: 'NASA Giovanni',
+      url: 'https://giovanni.gsfc.nasa.gov/',
+      description:
+        'Web-based environment for interactive analysis, visualization, and exploration of NASA Earth science satellite and reanalysis data.',
+    },
+    {
+      title: 'NASA Hydrology Time Series',
+      url: 'https://disc.gsfc.nasa.gov/information/tools?title=Hydrology%20Time%20Series',
+      description:
+        'Online portal for point and regional extraction of multi-mission hydrological time series and land-surface model outputs.',
+    },
+    {
+      title: 'NOAA Climate Data Online',
+      url: 'https://www.ncei.noaa.gov/cdo-web/',
+      description:
+        'National Centers for Environmental Information repository providing free access to global historical weather station observations.',
+    },
+    {
+      title: 'KNMI Climate Explorer',
+      url: 'https://climexp.knmi.nl/',
+      description:
+        'Statistical research workbench for climate researchers to correlate, verify, and perform time-series analysis on global datasets.',
+    },
+    {
+      title: 'Statistical test methods to detect trends in time series data',
+      url: 'https://medium.com/@snp.kriss/statistical-test-methods-to-detect-trends-in-time-series-data-b361a0ec530b',
+      description:
+        'Comprehensive technical overview of parametric vs. non-parametric methods, Mann-Kendall formulation, and Sen’s slope estimator.',
+    },
+    {
+      title: 'A Comprehensive Guide to Statistical Significance',
+      url: 'https://www.statsig.com/perspectives/a-comprehensive-guide-to-statistical-significance',
+      description:
+        'Pedagogical introduction to hypothesis testing, null hypotheses, p-values, confidence bounds, and Type I/II errors.',
+    },
+    {
+      title:
+        'Time-Series Analysis of Remotely-Sensed SeaWiFS Chlorophyll in River-Influenced Coastal Regions',
+      url: 'https://ntrs.nasa.gov/api/citations/20090042747/downloads/20090042747.pdf',
+      description:
+        'NASA technical publication detailing deseasonalizing methodologies and non-parametric monotonic trend detection on satellite time series.',
+    },
+  ];
+
+  const citations = [
+    {
+      author: 'Mann, H. B. (1945)',
+      citation: 'Nonparametric tests against trend. Econometrica, 13(3), 245–259.',
+    },
+    {
+      author: 'Kendall, M. G. (1975)',
+      citation: 'Rank Correlation Methods. 4th edition, Charles Griffin, London.',
+    },
+    {
+      author: 'Sen, P. K. (1968)',
+      citation:
+        "Estimates of the regression coefficient based on Kendall's tau. Journal of the American Statistical Association, 63(324), 1379–1389.",
+    },
+    {
+      author: 'Hamed, K. H., & Rao, A. R. (1998)',
+      citation:
+        'A modified Mann-Kendall trend test for autocorrelated data. Journal of Hydrology, 204(1–4), 182–196.',
+    },
+  ];
+
   return (
     <div className="max-w-5xl mx-auto space-y-8 my-8 text-slate-200">
       {/* Hero Header */}
@@ -19,7 +98,7 @@ export default function MethodologyView() {
         </p>
       </div>
 
-      {/* Grid of Sections */}
+      {/* Grid of Analytical Core Sections */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 1. Deseasonalizing */}
         <div className="glass-card rounded-2xl p-6 border border-white/10 space-y-4">
@@ -38,20 +117,20 @@ export default function MethodologyView() {
           </p>
         </div>
 
-        {/* 2. Mann-Kendall Test */}
+        {/* 2. Mann-Kendall Test with Hamed-Rao Autocorrelation Correction */}
         <div className="glass-card rounded-2xl p-6 border border-white/10 space-y-4">
           <div className="flex items-center gap-2.5 text-cyan-400">
             <BarChart2 className="w-5 h-5" />
-            <h3 className="text-lg font-bold text-white">2. Mann-Kendall Non-Parametric Test</h3>
+            <h3 className="text-lg font-bold text-white">2. Mann-Kendall Test & Hamed-Rao Correction</h3>
           </div>
           <p className="text-xs text-slate-300 leading-relaxed">
-            Environmental data rarely follows a clean bell curve. Extreme floods, hurricanes, and heatwaves create non-normal distributions with heavy tails.
+            Environmental data rarely follows a clean bell curve. Extreme floods, heatwaves, and storms create non-normal distributions with heavy tails. The <strong>Mann-Kendall test</strong> evaluates whether a time series has a monotonic directional climb or decline without assuming a normal distribution.
           </p>
           <div className="p-3.5 rounded-xl bg-slate-900/80 border border-white/10 font-mono text-xs text-cyan-300">
             S = ∑ sgn(x_j - x_k) for all pairs j &gt; k
           </div>
           <p className="text-xs text-slate-400 leading-relaxed">
-            The <strong>Mann-Kendall rank test</strong> is non-parametric (distribution-free). It counts whether subsequent observations are systematically higher or lower than earlier ones. When the normalized score yields <code>p &lt; 0.05</code>, we reject the null hypothesis of randomness with 95% statistical confidence.
+            <strong>Why Autocorrelation Correction (Hamed &amp; Rao, 1998)?</strong> Monthly climate series possess "climate memory" (lag-1 serial autocorrelation) — an unusually warm month is frequently followed by another warm month due to thermal inertia. Standard Mann-Kendall tests assume observations are statistically independent; positive autocorrelation inflates the variance of S, which artificially deflates the p-value and leads to false-positive trend declarations (Type I errors). We implement the <strong>Hamed &amp; Rao modification</strong>, which computes an effective sample size n* across detrended ranks and adjusts the variance of S so significance testing remains mathematically honest.
           </p>
         </div>
 
@@ -120,29 +199,129 @@ export default function MethodologyView() {
           <div className="p-3 rounded-xl bg-slate-900/60 border border-white/5 space-y-1">
             <strong className="text-amber-300 block">Reanalysis Models</strong>
             <p>
-              NASA POWER relies on MERRA-2 assimilation, blending physical satellite radiometer observations with atmospheric general circulation models.
+              NASA MERRA-2 reanalysis (satellite-informed model data) via NASA POWER blends physical spaceborne radiometer observations with NASA GMAO atmospheric circulation models.
             </p>
           </div>
         </div>
       </div>
 
-      {/* 6. Data Credits */}
-      <div className="glass-card rounded-2xl p-6 border border-white/10 flex items-center justify-between flex-wrap gap-4 text-xs text-slate-400">
-        <div className="flex items-center gap-3">
-          <Database className="w-5 h-5 text-cyan-400 shrink-0" />
-          <div>
-            <div className="font-bold text-slate-200">NASA POWER Project & MERRA-2 Reanalysis</div>
-            <div>NASA Langley Research Center • Prediction Of Worldwide Energy Resources (AG Community)</div>
+      {/* 6. Scientific Validation */}
+      <div className="glass-card rounded-2xl p-6 border border-cyan-500/30 space-y-5 bg-gradient-to-b from-cyan-950/10 to-slate-900/40">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2.5 text-cyan-400">
+            <CheckCircle2 className="w-5 h-5 text-cyan-400" />
+            <h3 className="text-lg font-bold text-white">6. Scientific Validation</h3>
+          </div>
+          <span className="text-xs font-mono text-cyan-300 bg-cyan-500/10 border border-cyan-500/20 px-2.5 py-1 rounded-full">
+            Benchmark: NASA Giovanni vs. Earth Trend Detective
+          </span>
+        </div>
+
+        <p className="text-xs text-slate-300 leading-relaxed">
+          To verify our pipeline's analytical accuracy, we cross-validated our results against an independent retrieval from NASA Giovanni (MERRA-2 monthly surface air temperature product <code>M2TMNXSLV</code>). Both calculations yield statistically consistent slopes and 95% confidence intervals within hundredths of a degree.
+        </p>
+
+        {/* Validation Screenshot */}
+        <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-950/60 p-2 shadow-2xl">
+          <img
+            src="/validation_giovanni_svalbard.png"
+            alt="Svalbard T2M trend validation comparison with NASA Giovanni"
+            className="w-full h-auto rounded-lg object-contain max-h-[500px]"
+            loading="lazy"
+          />
+        </div>
+
+        {/* Caption */}
+        <div className="p-4 rounded-xl bg-slate-900/80 border border-cyan-500/20 text-xs text-slate-300 leading-relaxed">
+          <strong className="text-cyan-300 block mb-1">Validation Evidence &amp; Findings:</strong>
+          Svalbard T2M trend, 1990-2024: +0.69 °C/decade (95% CI +0.50 to +0.88) in our tool vs +0.687 °C/decade (95% CI +0.50 to +0.88) computed from NASA Giovanni (MERRA-2 M2TMNXSLV, same grid cell at 15.625E, 78N). Both significant. Data: <code>validation/giovanni_svalbard_t2m.csv</code> in the repo.
+        </div>
+      </div>
+
+      {/* 7. References & Further Tools */}
+      <div className="glass-card rounded-2xl p-6 border border-white/10 space-y-6">
+        <div className="flex items-center gap-2.5 text-cyan-400">
+          <Compass className="w-5 h-5" />
+          <h3 className="text-lg font-bold text-white">7. References &amp; Further Tools</h3>
+        </div>
+
+        <p className="text-xs text-slate-300 leading-relaxed">
+          Explore authoritative external platforms, research portals, and technical documentation to cross-examine Earth observation data and statistical methods. <em>Note: Each external site's data terms apply.</em>
+        </p>
+
+        {/* Links Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {references.map((item, idx) => (
+            <a
+              key={idx}
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-4 rounded-xl bg-slate-900/60 border border-white/5 hover:border-cyan-500/40 hover:bg-slate-900 transition-all group flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 text-cyan-300 font-semibold text-xs group-hover:text-cyan-200">
+                  <span>{item.title}</span>
+                  <ExternalLink className="w-3.5 h-3.5 shrink-0 opacity-70 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                  {item.description}
+                </p>
+              </div>
+              <span className="text-[10px] text-cyan-400/80 font-mono mt-3 block">
+                Open in new tab ↗
+              </span>
+            </a>
+          ))}
+        </div>
+
+        {/* Text Citations */}
+        <div className="pt-4 border-t border-white/5 space-y-3">
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-300 uppercase tracking-wider">
+            <BookmarkCheck className="w-4 h-4 text-cyan-400" />
+            <span>Seminal Literature &amp; Mathematical Citations</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-400">
+            {citations.map((c, i) => (
+              <div key={i} className="p-3 rounded-lg bg-slate-950/40 border border-white/5 space-y-0.5">
+                <div className="font-semibold text-slate-300">{c.author}</div>
+                <div className="text-[11px] text-slate-400 italic leading-snug">{c.citation}</div>
+              </div>
+            ))}
           </div>
         </div>
-        <a
-          href="https://power.larc.nasa.gov/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-cyan-400 hover:text-cyan-300 underline font-medium"
-        >
-          NASA POWER API Docs ↗
-        </a>
+      </div>
+
+      {/* 8. Data Credits & Official Disclaimer */}
+      <div className="glass-card rounded-2xl p-6 border border-white/10 space-y-4 text-xs text-slate-400">
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-3">
+            <Database className="w-5 h-5 text-cyan-400 shrink-0" />
+            <div>
+              <div className="font-bold text-slate-200">
+                NASA MERRA-2 reanalysis (satellite-informed model data) via NASA POWER
+              </div>
+              <div>NASA Langley Research Center • Prediction Of Worldwide Energy Resources (AG Community)</div>
+            </div>
+          </div>
+          <a
+            href="https://power.larc.nasa.gov/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cyan-400 hover:text-cyan-300 underline font-medium"
+          >
+            NASA POWER API Portal ↗
+          </a>
+        </div>
+
+        <div className="pt-3 border-t border-white/5 text-[11px] text-slate-500 leading-relaxed space-y-1">
+          <p>
+            <strong>Disclaimer:</strong> Data: NASA POWER, derived from MERRA-2 reanalysis (NASA GMAO). Built for the NASA Space Apps Challenge. NASA does not endorse this project or any non-U.S. Government entity, and is not responsible for information on non-U.S. Government websites.
+          </p>
+          <p className="italic">
+            Notice: Each external site's data terms apply.
+          </p>
+        </div>
       </div>
     </div>
   );

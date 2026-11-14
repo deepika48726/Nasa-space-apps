@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Sparkles, Info, ShieldAlert, Award } from 'lucide-react';
+import { Sparkles, Info, ShieldAlert, Award, ExternalLink } from 'lucide-react';
 
 export default function VerdictCard({ data }) {
   if (!data || !data.verdict) return null;
@@ -57,8 +57,35 @@ export default function VerdictCard({ data }) {
       <div className="mt-4 pt-3 border-t border-white/5 flex items-start gap-2.5 text-xs text-slate-400">
         <Info className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
         <p>
-          <span className="text-slate-300 font-medium">How scientists interpret this:</span> By removing the annual seasonal cycle and running a non-parametric Mann-Kendall rank test with Sen's slope, we evaluate whether climate change is driving a real shift rather than random weather noise.
+          <span className="text-slate-300 font-medium">How scientists interpret this:</span> By removing the annual seasonal cycle and running an autocorrelation-corrected Mann-Kendall rank test with Sen's slope, we evaluate whether climate change is driving a real shift rather than random weather noise.
         </p>
+      </div>
+
+      {/* Cross-check this result row */}
+      <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between flex-wrap gap-2 text-xs">
+        <div className="flex items-center gap-1.5 text-slate-300 font-medium">
+          <ExternalLink className="w-3.5 h-3.5 text-cyan-400" />
+          <span>Cross-check this result:</span>
+        </div>
+        <div className="flex items-center gap-3 text-xs">
+          <a
+            href="https://giovanni.gsfc.nasa.gov/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cyan-400 hover:text-cyan-300 underline font-medium inline-flex items-center gap-1 transition-colors"
+          >
+            NASA Giovanni ↗
+          </a>
+          <span className="text-slate-600">•</span>
+          <a
+            href="https://climexp.knmi.nl/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cyan-400 hover:text-cyan-300 underline font-medium inline-flex items-center gap-1 transition-colors"
+          >
+            KNMI Climate Explorer ↗
+          </a>
+        </div>
       </div>
     </div>
   );
