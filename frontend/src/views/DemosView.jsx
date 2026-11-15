@@ -129,14 +129,16 @@ export default function DemosView({ demos = [], onLaunchDemo }) {
               <div className="mt-6 pt-4 border-t border-white/5 flex flex-col gap-2">
                 <button
                   onClick={() => onLaunchDemo(demo)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition shadow-lg shadow-cyan-500/20"
+                  aria-label={`Load demo ${demo.title} into Investigate tab`}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] rounded-xl text-xs font-bold uppercase tracking-wider bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition shadow-lg shadow-cyan-500/20 cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
                 >
                   Load into Investigate
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handleRunInPlace(demo)}
-                  className="w-full flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition"
+                  aria-label={`${isPreviewing ? 'Hide' : 'Show'} live preview for ${demo.title}`}
+                  className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-medium bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
                 >
                   <Eye className="w-3.5 h-3.5 text-slate-400" />
                   {isPreviewing ? 'Hide In-Place Preview' : 'Explore Preview Here'}

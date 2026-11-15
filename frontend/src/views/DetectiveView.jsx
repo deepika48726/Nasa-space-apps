@@ -139,7 +139,8 @@ export default function DetectiveView({ onStartMission }) {
                   <button
                     key={opt.id}
                     onClick={() => handleSelectOption(opt.id)}
-                    className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between ${
+                    aria-label={`Select option ${opt.label}`}
+                    className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:outline-none min-h-[48px] ${
                       isSelected
                         ? 'bg-cyan-500/15 border-cyan-400 text-white shadow-lg shadow-cyan-500/10'
                         : 'bg-slate-900/60 border-white/10 text-slate-300 hover:border-white/20 hover:bg-slate-850'

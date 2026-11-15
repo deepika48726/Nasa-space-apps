@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { Scale, ArrowRightLeft, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
+import { Scale, ArrowRightLeft, AlertTriangle, CheckCircle, RefreshCw, AlertCircle } from 'lucide-react';
 import Plotly from 'plotly.js-dist-min';
 import createPlotlyComponent from 'react-plotly.js/factory';
 import VerdictCard from '../components/VerdictCard';
@@ -19,6 +19,7 @@ export default function CompareView({ variables = {}, presets = {} }) {
 
   const [comparison, setComparison] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const executeComparison = async () => {
     const pA = presets[locAKey];
@@ -26,6 +27,7 @@ export default function CompareView({ variables = {}, presets = {} }) {
     if (!pA || !pB) return;
 
     setLoading(true);
+    setError(null);
     try {
       const res = await runComparison({
         locationA: { lat: pA.lat, lon: pA.lon, name: pA.name },
@@ -37,7 +39,9 @@ export default function CompareView({ variables = {}, presets = {} }) {
       setComparison(res);
     } catch (err) {
       console.error(err);
-      toast.error(err.message || 'Comparison request failed');
+      const msg = err.message || 'Comparison request failed';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -238,9 +242,37 @@ export default function CompareView({ variables = {}, presets = {} }) {
         </div>
       </div>
 
-      {/* Loading state */}
+      {/* Error state */}
+      {error && (
+        <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-sm flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+            <div>
+              <strong>NASA Data Notice:</strong> {error}
+            </div>
+          </div>
+          <button
+            onClick={executeComparison}
+            className="px-3.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/30 text-xs font-semibold shrink-0 transition"
+          >
+            Retry Comparison
+          </button>
+        </div>
+      )}
+
+      {/* Loading state or Empty State */}
       {loading ? (
         <SkeletonLoader />
+      ) : !comparison && !error ? (
+        <div className="glass-card rounded-2xl p-10 border border-white/10 text-center space-y-3">
+          <div className="w-12 h-12 mx-auto rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+            <Scale className="w-6 h-6" />
+          </div>
+          <h4 className="text-base font-bold text-white">Select Locations to Compare</h4>
+          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            Choose two regions and a variable above to cross-examine their climate trends over identical time horizons.
+          </p>
+        </div>
       ) : comparison ? (
         <>
           {/* OPPOSITE TRENDS HIGHLIGHT BANNER */}

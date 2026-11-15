@@ -36,7 +36,7 @@ export default function Navbar({ activeTab, setActiveTab, backendOnline = true }
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="hidden md:flex items-center gap-1.5 bg-slate-900/80 p-1.5 rounded-xl border border-white/10">
+          <nav className="hidden md:flex items-center gap-1.5 bg-slate-900/80 p-1.5 rounded-xl border border-white/10" aria-label="Main Navigation">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -44,7 +44,10 @@ export default function Navbar({ activeTab, setActiveTab, backendOnline = true }
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  aria-label={`Switch to ${tab.label} tab`}
+                  aria-selected={isActive}
+                  role="tab"
+                  className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:outline-none ${
                     isActive
                       ? 'bg-cyan-500 text-slate-950 font-semibold shadow-lg shadow-cyan-500/25'
                       : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -59,7 +62,7 @@ export default function Navbar({ activeTab, setActiveTab, backendOnline = true }
         </div>
 
         {/* Mobile Navigation Bar */}
-        <div className="md:hidden flex overflow-x-auto py-2.5 gap-2 border-t border-white/5">
+        <div className="md:hidden flex overflow-x-auto py-2.5 gap-2 border-t border-white/5 scrollbar-none" role="tablist" aria-label="Mobile Navigation">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -67,10 +70,13 @@ export default function Navbar({ activeTab, setActiveTab, backendOnline = true }
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap font-medium transition-all ${
+                aria-label={`Switch to ${tab.label} tab`}
+                aria-selected={isActive}
+                role="tab"
+                className={`flex items-center gap-2 px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs whitespace-nowrap font-medium transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:outline-none ${
                   isActive
-                    ? 'bg-cyan-500 text-slate-950 font-semibold'
-                    : 'text-slate-300 bg-slate-900/60 border border-white/5'
+                    ? 'bg-cyan-500 text-slate-950 font-semibold shadow-md shadow-cyan-500/20'
+                    : 'text-slate-300 bg-slate-900/80 border border-white/10 active:bg-slate-800'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />

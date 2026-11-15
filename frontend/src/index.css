@@ -81,3 +81,20 @@
 .leaflet-tile {
   filter: brightness(0.85) contrast(1.1) hue-rotate(200deg) saturate(0.65) invert(1);
 }
+
+/* Accessible focus outline */
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 2px solid #06b6d4;
+  outline-offset: 2px;
+}
+
+/* Touch targets and smooth scrolling */
+@media (max-width: 640px) {
+  button, input, select {
+    min-height: 40px;
+  }
+}
+

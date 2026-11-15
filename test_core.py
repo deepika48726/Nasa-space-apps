@@ -54,6 +54,16 @@ def main():
     print("Verdict:")
     print("  ", res_prec["verdict"])
 
+    # Test 4: GPM IMERG Svalbard Precipitation (2000-2024)
+    print("\n--- Test 4: GPM IMERG Svalbard Precipitation (2000-2024) ---")
+    from data import get_gpm_precipitation
+    gpm_s = get_gpm_precipitation(2000, 2024)
+    assert len(gpm_s) > 0, "GPM precipitation series should not be empty"
+    res_gpm = analyze(gpm_s, var_name="GPM IMERG Precipitation", unit="mm/day", lat=78.0, lon=15.625)
+    print(f"Loaded {len(gpm_s)} months of GPM IMERG satellite precipitation records")
+    print(f"GPM slope: {res_gpm['slope_per_decade']:.4f} mm/day per decade (p={res_gpm['p']:.4f})")
+    assert "verdict" in res_gpm
+
     print("\nAll core tests passed successfully!")
 
 if __name__ == "__main__":
