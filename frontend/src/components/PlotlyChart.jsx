@@ -4,7 +4,7 @@ import createPlotlyComponent from 'react-plotly.js/factory';
 
 const Plot = createPlotlyComponent(Plotly);
 
-export default function PlotlyChart({ data }) {
+export default function PlotlyChart({ data, validationOverlay = null }) {
   if (!data || !data.dates || data.dates.length === 0) return null;
 
   const {
@@ -138,6 +138,43 @@ export default function PlotlyChart({ data }) {
       yaxis: 'y2',
     },
   ];
+
+  if (validationOverlay && validationOverlay.dates && validationOverlay.dates.length > 0) {
+    traces.push(
+      {
+        x: validationOverlay.dates,
+        y: validationOverlay.raw,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'NASA GPM IMERG Raw (Satellite)',
+        line: { color: '#f59e0b', width: 1.2, dash: 'dot' },
+        opacity: 0.8,
+        hovertemplate: `<b>%{x|%b %Y}</b><br>GPM Raw: %{y:.2f} ${validationOverlay.unit || ''}<extra></extra>`,
+        yaxis: 'y1',
+      },
+      {
+        x: validationOverlay.dates,
+        y: validationOverlay.anomalies,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'GPM IMERG Anomaly',
+        line: { color: '#fbbf24', width: 1.1, dash: 'dot' },
+        opacity: 0.85,
+        hovertemplate: `<b>%{x|%b %Y}</b><br>GPM Anom: %{y:+.2f} ${validationOverlay.unit || ''}<extra></extra>`,
+        yaxis: 'y2',
+      },
+      {
+        x: validationOverlay.dates,
+        y: validationOverlay.trend_line,
+        type: 'scatter',
+        mode: 'lines',
+        name: `GPM IMERG Trend (${(validationOverlay.slope_per_decade ?? 0) >= 0 ? '+' : ''}${validationOverlay.slope_per_decade?.toFixed(2)}/dec)`,
+        line: { color: '#f59e0b', width: 2.8, dash: 'dashdot' },
+        hovertemplate: `<b>%{x|%b %Y}</b><br>GPM Fit: %{y:+.2f} ${validationOverlay.unit || ''}<extra></extra>`,
+        yaxis: 'y2',
+      }
+    );
+  }
 
   const layout = {
     autosize: true,

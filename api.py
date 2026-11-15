@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from analysis import analyze
-from data import PowerAPIError, get_power_monthly
+from data import PowerAPIError, get_power_monthly, get_gpm_precipitation
 from presets import DETECTIVE_QUESTIONS, GUIDED_DEMOS, REGIONS, recommend_investigation
 from variables import VARIABLES
 
@@ -102,12 +102,66 @@ def _clean_float(val: Any) -> Optional[float]:
         return None
 
 
+def _compute_gpm_overlay(
+    power_raw_s: pd.Series,
+    power_anom_s: pd.Series,
+    start_year: int,
+    end_year: int,
+) -> Optional[Dict[str, Any]]:
+    """Compute benchmark comparison against NASA Giovanni GPM IMERG monthly precipitation."""
+    try:
+        gpm_s = get_gpm_precipitation(start_year=start_year, end_year=end_year)
+        if gpm_s is None or len(gpm_s) < 12:
+            return None
+        gpm_res = analyze(
+            gpm_s,
+            var_name="GPM IMERG Satellite Precipitation",
+            unit="mm/day",
+            lat=78.0,
+            lon=15.625,
+        )
+
+        overlap_df = pd.concat({"power_raw": power_raw_s, "gpm_raw": gpm_s}, axis=1).dropna()
+        overlap_anom = pd.concat({"power_anom": power_anom_s, "gpm_anom": gpm_res["anomalies"]}, axis=1).dropna()
+
+        corr_raw = float(overlap_df["power_raw"].corr(overlap_df["gpm_raw"])) if len(overlap_df) > 6 else None
+        corr_anom = float(overlap_anom["power_anom"].corr(overlap_anom["gpm_anom"])) if len(overlap_anom) > 6 else None
+
+        gpm_raw_s = gpm_res["raw_series"]
+        gpm_anom_s = gpm_res["anomalies"]
+        gpm_trend_s = gpm_res["trend_line"]
+
+        return {
+            "dataset_name": "NASA Giovanni GPM IMERG Final Run (Satellite-Gauge)",
+            "product_id": "GPM_3IMERGM_07_precipitation",
+            "location_name": "Svalbard Bounding Box (15.2°E–16.1°E, 78.0°N–78.4°N)",
+            "unit": "mm/day",
+            "dates": [d.strftime("%Y-%m-%d") for d in gpm_raw_s.index],
+            "raw": [_clean_float(v) for v in gpm_raw_s.values],
+            "anomalies": [_clean_float(v) for v in gpm_anom_s.values],
+            "trend_line": [_clean_float(v) for v in gpm_trend_s.values],
+            "slope_per_decade": _clean_float(gpm_res["slope_per_decade"]),
+            "ci_low": _clean_float(gpm_res["ci_low"]),
+            "ci_high": _clean_float(gpm_res["ci_high"]),
+            "p": _clean_float(gpm_res["p"]),
+            "significant": bool(gpm_res["significant"]),
+            "correlation_raw": _clean_float(corr_raw),
+            "correlation_anomaly": _clean_float(corr_anom),
+            "mean_gpm": _clean_float(float(overlap_df["gpm_raw"].mean())) if len(overlap_df) > 0 else None,
+            "mean_power": _clean_float(float(overlap_df["power_raw"].mean())) if len(overlap_df) > 0 else None,
+            "verdict": gpm_res["verdict"],
+        }
+    except Exception:
+        return None
+
+
 def _format_analysis_result(
     res: Dict[str, Any],
     var_key: str,
     lat: float,
     lon: float,
     name: Optional[str] = None,
+    validation_overlay: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Transform pandas Series output of analyze() into JSON-serializable structure."""
     raw_s: pd.Series = res["raw_series"]
@@ -176,6 +230,7 @@ def _format_analysis_result(
         "ci_high_line": ci_high_vals,
         "records": records,
         "mk_details": res.get("mk_details", {}),
+        "validation_overlay": validation_overlay,
     }
 
 
@@ -223,7 +278,25 @@ def _run_cached_analysis(
             lat=lat,
             lon=lon,
         )
-        formatted = _format_analysis_result(res, variable, lat, lon, name)
+
+        # Check if Svalbard precipitation is being analyzed: provide NASA GPM IMERG validation benchmark
+        validation_overlay = None
+        is_svalbard = (
+            (abs(lat - 78.22) < 2.0 and abs(lon - 15.65) < 5.0)
+            or (abs(lat - 78.0) < 2.0 and abs(lon - 15.625) < 5.0)
+            or (name and "svalbard" in name.lower())
+        )
+        if variable == "PRECTOTCORR" and is_svalbard:
+            validation_overlay = _compute_gpm_overlay(
+                power_raw_s=res["raw_series"],
+                power_anom_s=res["anomalies"],
+                start_year=start_year,
+                end_year=end_year,
+            )
+
+        formatted = _format_analysis_result(
+            res, variable, lat, lon, name, validation_overlay=validation_overlay
+        )
 
         # Store in cache
         if len(_CACHE) >= _MAX_CACHE_SIZE:
@@ -386,3 +459,49 @@ def compare_endpoint(req: CompareRequest):
         "opposite_trends": opposite,
         "message": message,
     }
+
+
+@app.get("/api/validation/precip")
+def get_precipitation_validation(start_year: int = 2000, end_year: int = 2024):
+    """Return scientific validation benchmark comparing NASA POWER MERRA-2 and NASA Giovanni GPM IMERG precipitation at Svalbard."""
+    try:
+        gpm_s = get_gpm_precipitation(start_year=start_year, end_year=end_year)
+        if gpm_s is None or len(gpm_s) < 12:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="GPM IMERG precipitation dataset not found or insufficient observations.",
+            )
+        gpm_res = analyze(
+            gpm_s,
+            var_name="GPM IMERG Satellite Precipitation",
+            unit="mm/day",
+            lat=78.0,
+            lon=15.625,
+        )
+
+        return {
+            "source": "NASA Giovanni GPM IMERG Final Run (Satellite-Gauge)",
+            "product": "GPM_3IMERGM_07_precipitation",
+            "location": "Svalbard (15.2°E–16.1°E, 78.0°N–78.4°N)",
+            "start_year": start_year,
+            "end_year": end_year,
+            "n_obs": gpm_res["n_obs"],
+            "slope_per_decade": _clean_float(gpm_res["slope_per_decade"]),
+            "ci_low": _clean_float(gpm_res["ci_low"]),
+            "ci_high": _clean_float(gpm_res["ci_high"]),
+            "p": _clean_float(gpm_res["p"]),
+            "significant": bool(gpm_res["significant"]),
+            "verdict": gpm_res["verdict"],
+            "dates": [d.strftime("%Y-%m-%d") for d in gpm_res["raw_series"].index],
+            "raw": [_clean_float(v) for v in gpm_res["raw_series"].values],
+            "anomalies": [_clean_float(v) for v in gpm_res["anomalies"].values],
+            "trend_line": [_clean_float(v) for v in gpm_res["trend_line"].values],
+        }
+    except HTTPException:
+        raise
+    except Exception as ex:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate precipitation validation benchmark: {str(ex)}",
+        )
+

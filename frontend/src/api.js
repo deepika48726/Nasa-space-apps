@@ -103,3 +103,13 @@ export async function runComparison({ locationA, locationB, variable, start_year
   }
   return res.json();
 }
+
+export async function fetchPrecipValidation(start_year = 2000, end_year = 2024) {
+  const res = await fetch(`${API_BASE}/validation/precip?start_year=${start_year}&end_year=${end_year}`);
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.detail || `Validation request failed (HTTP ${res.status})`);
+  }
+  return res.json();
+}
+

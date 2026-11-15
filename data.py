@@ -4,6 +4,7 @@ Fetches and cleans monthly point climate data from NASA POWER.
 """
 
 from typing import Optional
+import os
 import numpy as np
 import pandas as pd
 import requests
@@ -172,3 +173,45 @@ def get_power_monthly(
         )
 
     return series
+
+
+def get_gpm_precipitation(
+    start_year: Optional[int] = None,
+    end_year: Optional[int] = None,
+) -> pd.Series:
+    """Load monthly NASA Giovanni GPM IMERG precipitation data for Svalbard.
+
+    Reads data/precipitation_gpm_monthly.csv, converts mm/hr to mm/day (x 24),
+    masks fill values, and returns a pandas Series indexed by DatetimeIndex.
+
+    Args:
+        start_year: Optional starting 4-digit calendar year filter.
+        end_year: Optional ending 4-digit calendar year filter.
+
+    Returns:
+        pd.Series: Monthly precipitation in mm/day indexed by DatetimeIndex.
+    """
+    csv_path = os.path.join(os.path.dirname(__file__), "data", "precipitation_gpm_monthly.csv")
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"GPM precipitation dataset not found at {csv_path}")
+
+    with open(csv_path, "r", encoding="utf-8") as f:
+        lines = f.read().splitlines()
+
+    start_idx = next(i for i, line in enumerate(lines) if line.lower().startswith("time"))
+    df = pd.read_csv(csv_path, skiprows=start_idx)
+    df.columns = ["time", "val"]
+    df["time"] = pd.to_datetime(df["time"])
+    s = df.set_index("time")["val"].astype(float)
+    # Mask Giovanni fill values (-9999.9 or outside valid range) and convert mm/hr to mm/day
+    s = s.where((s > -9990.0) & (s < 1e14)) * 24.0
+    s.name = "GPM_IMERG_PRECTOT"
+    s = s.sort_index()
+
+    if start_year is not None:
+        s = s[s.index.year >= start_year]
+    if end_year is not None:
+        s = s[s.index.year <= end_year]
+
+    return s
+
