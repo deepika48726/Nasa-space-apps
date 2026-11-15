@@ -226,7 +226,7 @@ export default function PlotlyChart({ data, validationOverlay = null }) {
     },
     xaxis2: {
       anchor: 'y2',
-      title: { text: 'Observation Timeline (1990–Present)', font: { size: 11, color: '#94a3b8' } },
+      title: { text: 'Observation Timeline', font: { size: 11, color: '#94a3b8' } },
       gridcolor: 'rgba(255, 255, 255, 0.06)',
     },
   };

@@ -134,7 +134,55 @@ export default function InvestigateView({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 my-6">
+    <div className="space-y-6 my-6">
+      {/* ----------------- FIRST-SCREEN STUDENT HERO BANNER ----------------- */}
+      <div className="glass-card rounded-2xl p-6 sm:p-7 border border-cyan-500/20 bg-gradient-to-r from-cyan-950/40 via-slate-900/70 to-indigo-950/30 relative overflow-hidden shadow-2xl">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-3xl">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                Student STEM Climate Lab
+              </span>
+              <span className="text-[11px] text-slate-400 font-mono">
+                Satellite-Informed NASA MERRA-2 Reanalysis via NASA POWER
+              </span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Investigate Earth's Climate Signals &amp; Separate Real Trends from Weather Noise
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Climate science begins with data. Select an observation parameter and geographic coordinate below to analyze multi-decade monthly time series. Our statistical engine subtracts annual seasonal oscillations (Earth's 23.5° axial tilt) and applies the autocorrelation-corrected Hamed-Rao Mann-Kendall test to determine whether climate trends are statistically significant.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 shrink-0 text-xs">
+            <div className="p-3 rounded-xl bg-slate-900/80 border border-white/10 text-slate-300 flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shrink-0"></span>
+              <div>
+                <strong className="block text-white text-[11px]">1. Choose Variable</strong>
+                <span className="text-[10px] text-slate-400">Temp, Rain, Wind, Solar</span>
+              </div>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-900/80 border border-white/10 text-slate-300 flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0"></span>
+              <div>
+                <strong className="block text-white text-[11px]">2. Select Region</strong>
+                <span className="text-[10px] text-slate-400">Preset biomes or map pin</span>
+              </div>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-900/80 border border-white/10 text-slate-300 flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
+              <div>
+                <strong className="block text-white text-[11px]">3. Test Significance</strong>
+                <span className="text-[10px] text-slate-400">Theil-Sen slope &amp; p-value</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
       {/* ----------------- LEFT CONTROL PANEL (4 Cols) ----------------- */}
       <div className="lg:col-span-4 space-y-6">
         {/* Variable Selection */}
@@ -290,17 +338,35 @@ export default function InvestigateView({
 
         {/* Error Banner */}
         {error && (
-          <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-sm flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
-            <div>
-              <strong>NASA Data Notice:</strong> {error}
+          <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-sm flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+              <div>
+                <strong>NASA Data Notice:</strong> {error}
+              </div>
             </div>
+            <button
+              onClick={executeAnalysis}
+              className="px-3.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/30 text-xs font-semibold shrink-0 transition"
+            >
+              Retry Query
+            </button>
           </div>
         )}
 
         {/* Loading State or Data Display */}
         {loading ? (
           <SkeletonLoader />
+        ) : !data && !error ? (
+          <div className="glass-card rounded-2xl p-10 border border-white/10 text-center space-y-3">
+            <div className="w-12 h-12 mx-auto rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+              <Sliders className="w-6 h-6" />
+            </div>
+            <h4 className="text-base font-bold text-white">Ready for Investigation</h4>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              Select an Earth variable and geographic coordinate on the left panel to launch your climate trend analysis.
+            </p>
+          </div>
         ) : data ? (
           <>
             {/* 4 Animated Metric Cards */}
@@ -392,5 +458,6 @@ export default function InvestigateView({
         ) : null}
       </div>
     </div>
+  </div>
   );
 }
