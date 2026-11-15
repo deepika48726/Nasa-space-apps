@@ -25,8 +25,9 @@ Earth Trend Detective is designed with a modern decoupled full-stack architectur
      - `GET /api/variables` — Variable catalog with units and student definitions
      - `GET /api/presets` — Curated geographic biomes
      - `GET /api/demos` — 3 guided case studies with story context
-     - `POST /api/analyze` — Deseasonalized anomalies, Theil-Sen slope, 95% CI, Mann-Kendall $p$-value, verdict
+     - `POST /api/analyze` — Deseasonalized anomalies, Theil-Sen slope, 95% CI, Mann-Kendall $p$-value, verdict, and optional GPM satellite validation overlay
      - `POST /api/compare` — Comparative trend analysis between two locations with `opposite_trends` flag
+     - `GET /api/validation/precip` — Validation benchmark comparing NASA POWER MERRA-2 and NASA Giovanni GPM IMERG satellite precipitation
 
 3. **Core Python Analytics Engine:**
    - `data.py` — NASA Langley POWER API client (AG community, monthly/point endpoint, month 13 & -999 fill sanitization)
@@ -39,22 +40,23 @@ Earth Trend Detective is designed with a modern decoupled full-stack architectur
 
 ## ⚡ Quick Start & Run Instructions
 
-> [!NOTE]
-> **Windows Python Environment Note:**  
-> On this Windows system, plain `python` resolves to MSYS2 (`C:\msys64-2\mingw64\bin\python.exe`).  
-> Use the working Python executable directly:  
-> `C:\Users\deepi\AppData\Local\Programs\Python\Python310\python.exe`
+> [!TIP]
+> **Python Environment Note:**  
+> Use your Python virtual environment (e.g. `.\.venv\Scripts\Activate.ps1` on Windows or `source .venv/bin/activate` on Linux/macOS) or call the Python interpreter directly.
 
 ### 1. Start the FastAPI Backend
 
-Open a terminal in the project root (`c:\Users\deepi\Downloads\Urbanpulse`):
+Open a terminal in the project root:
 
 ```powershell
-# Using the Windows Python 3.10 executable:
-& 'C:\Users\deepi\AppData\Local\Programs\Python\Python310\python.exe' -m uvicorn api:app --reload --port 8000
+# Activate virtual environment if available:
+.\.venv\Scripts\Activate.ps1
 
-# Or if your default python is Python 3.10:
+# Start FastAPI with Uvicorn:
 uvicorn api:app --reload --port 8000
+
+# Or via python -m:
+python -m uvicorn api:app --reload --port 8000
 ```
 
 The backend API will start at: `http://127.0.0.1:8000`  
@@ -82,7 +84,10 @@ The React frontend will be live at: **`http://localhost:5173`**
 If you wish to run the standalone Streamlit app:
 
 ```powershell
-& 'C:\Users\deepi\AppData\Local\Programs\Python\Python310\python.exe' -m streamlit run app.py
+streamlit run app.py
+
+# Or via python -m:
+python -m streamlit run app.py
 ```
 
 ---
@@ -149,7 +154,7 @@ After the frontend is deployed, copy its URL back to Render's `FRONTEND_ORIGIN` 
 ## 📁 Repository Structure
 
 ```
-Urbanpulse/
+Nasa-space-apps/
 ├── api.py                  # FastAPI REST backend (CORS enabled for localhost:5173)
 ├── frontend/               # Modern React + Vite frontend application
 │   ├── src/
@@ -162,7 +167,12 @@ Urbanpulse/
 │   ├── index.html          # HTML shell with Inter font & Leaflet styling
 │   ├── vite.config.js      # Vite configuration with Tailwind plugin & /api proxy
 │   └── package.json        # Frontend dependencies
-├── data.py                 # NASA POWER API client (AG community, monthly/point endpoint)
+├── data/
+│   └── precipitation_gpm_monthly.csv # NASA Giovanni GPM IMERG satellite precipitation benchmark
+├── validation/
+│   ├── giovanni_svalbard_t2m.csv     # NASA Giovanni Svalbard temperature benchmark dataset
+│   └── validation_giovanni_svalbard.png
+├── data.py                 # NASA POWER API client & GPM IMERG reader
 ├── analysis.py             # Trend statistics (Hamed-Rao Mann-Kendall & Theil-Sen slope) & verdict generator
 ├── variables.py            # Variable definitions & units
 ├── presets.py              # Biomes, demo scenarios, detective logic
@@ -198,11 +208,21 @@ Urbanpulse/
 
 ## 🔬 Scientific Validation
 
-To verify the analytical rigor of our trend calculation and autocorrelation-corrected test, our pipeline was benchmarked against an independent retrieval from **NASA Giovanni** (MERRA-2 monthly surface air temperature product `M2TMNXSLV`):
+To verify the analytical rigor of our trend calculation and autocorrelation-corrected test, our pipeline was benchmarked against two independent satellite retrievals from **NASA Giovanni**:
 
-![Svalbard T2M Validation](validation/validation_giovanni_svalbard.png)
+1. **Surface Air Temperature (T2M) Benchmark:**
+   Cross-validated against MERRA-2 monthly surface air temperature product `M2TMNXSLV` at Svalbard (15.625°E, 78.0°N):
 
-> **Caption:** Svalbard T2M trend, 1990-2024: +0.69 °C/decade (95% CI +0.50 to +0.88) in our tool vs +0.687 °C/decade (95% CI +0.50 to +0.88) computed from NASA Giovanni (MERRA-2 M2TMNXSLV, same grid cell at 15.625E, 78N). Both significant. Data: `validation/giovanni_svalbard_t2m.csv` in the repo.
+   ![Svalbard T2M Validation](validation/validation_giovanni_svalbard.png)
+
+   > **Caption:** Svalbard T2M trend, 1990-2024: +0.69 °C/decade (95% CI +0.50 to +0.88) in our tool vs +0.687 °C/decade (95% CI +0.50 to +0.88) computed from NASA Giovanni (MERRA-2 M2TMNXSLV, same grid cell at 15.625E, 78N). Both significant. Data: `validation/giovanni_svalbard_t2m.csv` in the repo.
+
+2. **Precipitation Satellite Benchmark (GPM IMERG):**
+   Cross-validated against the Global Precipitation Measurement (GPM) monthly satellite-gauge product `GPM_3IMERGM_07` (2000–2024, Svalbard area average 15.2°E–16.1°E, 78.0°N–78.4°N):
+   - Monthly raw correlation: $r = 0.81$
+   - Deseasonalized anomaly correlation: $r = 0.77$
+   - Both datasets confirm consistent variability and agree that precipitation fluctuations remain within natural inter-annual variability ($p \ge 0.05$).
+   - Data: `data/precipitation_gpm_monthly.csv` in the repo, integrated via optional validation overlay on the API and frontend.
 
 ---
 
