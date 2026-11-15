@@ -71,14 +71,15 @@ export default function MapPicker({
           center={center}
           zoom={3}
           minZoom={1}
-          maxZoom={12}
+          maxZoom={18}
           scrollWheelZoom={false}
           style={{ width: '100%', height: '100%' }}
         >
-          {/* CartoDB Positron styled tile layer */}
+          {/* OpenStreetMap tile layer */}
           <TileLayer
-            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            maxZoom={18}
           />
           <Marker position={center} icon={icon}>
             <Popup className="text-slate-900 font-sans">
