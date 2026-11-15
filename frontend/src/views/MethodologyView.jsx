@@ -1,3 +1,4 @@
+// Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 import React from 'react';
 import {
   BookOpen,
@@ -11,6 +12,7 @@ import {
   BookmarkCheck,
   FileText,
   Compass,
+  Sparkles,
 } from 'lucide-react';
 
 export default function MethodologyView() {
@@ -358,6 +360,31 @@ export default function MethodologyView() {
             Notice: Each external site's data terms apply.
           </p>
         </div>
+      </div>
+
+      {/* 9. Super Intelligence (SI) Disclosure */}
+      <div className="glass-card rounded-2xl p-6 border border-white/10 space-y-3 text-xs text-slate-300">
+        <div className="flex items-center gap-2.5 text-cyan-400">
+          <Sparkles className="w-5 h-5" />
+          <h3 className="text-base font-bold text-white">Super Intelligence (SI) Disclosure</h3>
+        </div>
+        <p className="text-slate-300 leading-relaxed">
+          This project was developed with SI assistance:
+        </p>
+        <ul className="list-disc list-inside space-y-1.5 text-slate-400 text-xs pl-1">
+          <li>
+            <strong className="text-slate-200">Code:</strong> the FastAPI backend, React frontend and Streamlit prototype were generated and refined with Google Antigravity (AI coding agent) and Anthropic's Claude, then reviewed, tested and run by the team.
+          </li>
+          <li>
+            <strong className="text-slate-200">Text:</strong> the README, in-app explanations and Methodology wording were drafted with AI assistance and edited by the team.
+          </li>
+          <li>
+            <strong className="text-slate-200">Data and analysis:</strong> NASA POWER/MERRA-2 data is real NASA data. All trend statistics (Theil-Sen, Hamed-Rao Mann-Kendall) were validated by us against NASA Giovanni output.
+          </li>
+        </ul>
+        <p className="text-[11px] text-slate-500 pt-1">
+          No NASA logos or branding are used.
+        </p>
       </div>
     </div>
   );

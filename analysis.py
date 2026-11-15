@@ -1,3 +1,4 @@
+# Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 """Statistical trend analysis module for Earth Trend Detective.
 
 Removes seasonal cycles, executes the Mann-Kendall trend test, computes

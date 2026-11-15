@@ -1,3 +1,4 @@
+// Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Download, RefreshCw, Sliders, MapPin, Sparkles, AlertCircle, Satellite } from 'lucide-react';

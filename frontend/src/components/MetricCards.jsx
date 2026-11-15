@@ -1,3 +1,4 @@
+// Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Minus, CheckCircle2, XCircle, Activity, Gauge } from 'lucide-react';

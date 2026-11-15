@@ -1,3 +1,4 @@
+// Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 import React from 'react';
 
 export default function SkeletonLoader() {

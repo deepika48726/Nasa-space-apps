@@ -1,3 +1,4 @@
+// Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Sparkles, Info, ShieldAlert, Award, ExternalLink } from 'lucide-react';

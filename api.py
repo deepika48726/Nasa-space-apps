@@ -1,3 +1,4 @@
+# Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 """FastAPI backend for Earth Trend Detective.
 
 Exposes NASA POWER climate data fetching and trend analysis via REST API endpoints.

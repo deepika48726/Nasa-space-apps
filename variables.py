@@ -1,3 +1,4 @@
+# Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 """Variable catalog for Earth Trend Detective.
 
 Contains NASA POWER parameter definitions, units, and student-friendly explanations.

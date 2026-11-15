@@ -1,3 +1,4 @@
+// Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 import React, { useState } from 'react';
 import { Compass, ArrowRight, Eye, Sparkles, CheckCircle2 } from 'lucide-react';
 import PlotlyChart from '../components/PlotlyChart';

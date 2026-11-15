@@ -1,3 +1,4 @@
+# Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 """Interactive Plotly visualizations for Earth Trend Detective.
 
 Generates space-themed, student-friendly charts for time series, anomalies,

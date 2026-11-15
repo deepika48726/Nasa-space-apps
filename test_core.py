@@ -1,3 +1,4 @@
+# Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 """Test script to verify data.py and analysis.py."""
 
 import sys

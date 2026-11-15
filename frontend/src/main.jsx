@@ -1,3 +1,4 @@
+// Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'

@@ -1,3 +1,4 @@
+# Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 """NASA POWER API client for Earth Trend Detective.
 
 Fetches and cleans monthly point climate data from NASA POWER.

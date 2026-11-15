@@ -1,3 +1,4 @@
+// Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 import React from 'react';
 import { Search, Scale, Compass, Sparkles, BookOpen, Globe2, Radio } from 'lucide-react';
 

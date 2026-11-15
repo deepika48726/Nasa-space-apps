@@ -1,3 +1,4 @@
+# Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 """Earth Trend Detective - NASA Space Apps Challenge Web Application.
 
 An interactive STEM educational tool empowering students to investigate

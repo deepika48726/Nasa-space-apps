@@ -247,6 +247,16 @@ Authoritative portals, platforms, and technical literature for cross-examining E
 
 ---
 
+## 🤖 Super Intelligence (SI) Disclosure
+
+This project was developed with SI assistance:
+- Code: the FastAPI backend, React frontend and Streamlit prototype were generated and refined with Google Antigravity (AI coding agent) and Anthropic's Claude, then reviewed, tested and run by the team.
+- Text: the README, in-app explanations and Methodology wording were drafted with AI assistance and edited by the team.
+- Data and analysis: NASA POWER/MERRA-2 data is real NASA data. All trend statistics (Theil-Sen, Hamed-Rao Mann-Kendall) were validated by us against NASA Giovanni output.
+No NASA logos or branding are used.
+
+---
+
 ## ⚖️ Disclaimer
 
 Data: NASA POWER, derived from MERRA-2 reanalysis (NASA GMAO). Built for the NASA Space Apps Challenge. NASA does not endorse this project or any non-U.S. Government entity, and is not responsible for information on non-U.S. Government websites.

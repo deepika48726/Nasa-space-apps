@@ -1,3 +1,4 @@
+// Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 import React, { useState, useEffect } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import Navbar from './components/Navbar';
@@ -140,8 +141,13 @@ export default function App() {
 
       {/* Global Footer on every tab */}
       <footer className="border-t border-white/5 py-6 text-center text-[11px] text-slate-500">
-        <div className="max-w-4xl mx-auto px-4 leading-relaxed">
-          Data: NASA POWER, derived from MERRA-2 reanalysis (NASA GMAO). Built for the NASA Space Apps Challenge. NASA does not endorse this project or any non-U.S. Government entity, and is not responsible for information on non-U.S. Government websites.
+        <div className="max-w-4xl mx-auto px-4 leading-relaxed space-y-1">
+          <div>
+            Data: NASA POWER, derived from MERRA-2 reanalysis (NASA GMAO). Built for the NASA Space Apps Challenge. NASA does not endorse this project or any non-U.S. Government entity, and is not responsible for information on non-U.S. Government websites.
+          </div>
+          <div className="text-slate-400">
+            Built with SI assistance (Google Antigravity, Anthropic Claude).
+          </div>
         </div>
       </footer>
     </div>

@@ -1,3 +1,4 @@
+# Generated with SI assistance (Google Antigravity / Anthropic Claude); reviewed by the team.
 """Region presets, demo cases, and detective question configurations.
 
 Provides curated geographic regions and guided exploration stories for students.
